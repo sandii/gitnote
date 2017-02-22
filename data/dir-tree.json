@@ -1,0 +1,16 @@
+{
+	"root" : {
+		"repo-0" : {},
+		"repo-1" : {
+			"dir-1" : {}
+		},
+		"repo-2" : {
+			"dir-2" : {
+				"file1" : null,
+				"file2" : null
+			},
+			"dir-3" : {},
+			"file-3" : null
+		}
+	}
+}

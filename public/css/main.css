@@ -1,0 +1,81 @@
+@import url(base.css);
+@import url(article.css);
+header{
+	position:absolute;
+	top:0; left:0; right:0; height:60px;
+	background:#545454;
+}
+header>.icon{
+	position:absolute; display:block;
+	left:10px; top:10px; width:38px; height:38px;
+	border:1px solid #808080; border-radius:3px;
+	background:no-repeat url(../img/icon.png) center/contain;
+	cursor:pointer;
+}
+aside{
+	position:absolute;
+	top:60px; left:0; bottom:0; width:300px;
+	background:black;
+}
+.aside-ctrl{
+	position:relative;
+	height:40px;
+}
+.aside-ctrl>li{
+	position:absolute; top:0;
+	width:40px; height:100%;
+	background:no-repeat center/20px auto;
+	opacity:0.9; cursor:pointer;
+}
+.aside-ctrl>.back{
+	left:0;
+	background-image:url(../img/back.png);
+}
+.aside-ctrl>.sync{
+	right:160px;
+	background-image:url(../img/sync.png);
+}
+.aside-ctrl>.add{
+	right:120px;
+	background-image:url(../img/add.png);
+}
+.aside-ctrl>.rename{
+	right:80px;
+	background-image:url(../img/rename.png);
+	background-size:auto 20px; 
+}
+.aside-ctrl>.del{
+	right:40px;
+	background-image:url(../img/del.png);
+	background-size:auto 20px; 
+}
+.aside-ctrl>.edit{
+	right:0;
+	background-image:url(../img/edit.png);
+}
+.aside-list{
+	position:absolute;
+	top:40px; left:0; right:0; bottom:0;
+	overflow-x:hidden; overflow-y:scroll;
+}
+.aside-list>li{
+	height:40px; line-height:40px; padding:0 40px;
+	background:no-repeat 10px center/20px auto; 
+	opacity:0.9;
+	cursor:pointer; overflow:hidden; 
+}
+.aside-list>.checked{background-color:#808080;}
+.aside-list>.repo{background-image:url(../img/repo.png);}
+.aside-list>.dir{background-image:url(../img/dir.png);}
+.aside-list>.pic{background-image:url(../img/pic.png);}
+.aside-list>.file{background-image:url(../img/file.png);}
+nav{
+	position:absolute;
+	top:60px; left:300px; right:0; height:60px; line-height:60px;
+	padding-left:40px;
+	background-color:#111; color:#b3b3b3;
+}
+nav>span{
+	padding:0 10px;
+	cursor:pointer;
+}
