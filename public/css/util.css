@@ -1,0 +1,38 @@
+.tip-box,
+.wait-box{
+	display:flex; justify-content:center; align-items:center;
+	z-index:2000;
+	background:rgba(0,0,0,.2);
+}
+.tip-box>span,
+.wait-box>span{
+	max-width:65%; line-height:26px;
+	padding:20px 6%; border-radius:8px;
+	background:black; color:white;
+	text-align:center; font-size:16px;
+	box-shadow:0px 0px 10px black;
+}
+
+.ask-box{
+	display:flex; justify-content:center; align-items:center;
+	z-index:2000;
+	background:rgba(0,0,0,.2);
+}
+.ask-wrap{
+	position:relative;
+	width:140px;
+	padding:20px 6% 60px; border-radius:8px;
+	background:black; color:white;
+	text-align:center; font-size:16px;
+	box-shadow:0px 0px 10px black;
+}
+.ask-wrap>p{line-height:26px;}
+.ask-wrap>div{
+	position:absolute;
+	bottom:0; width:50%; height:50px; line-height:50px;
+	color:#db495d; cursor:pointer;
+}
+.ask-ok{right:0;}
+.ask-no{left:0;}
+
+

@@ -1,4 +1,10 @@
+import tip from './util/tip';
+import ask from './util/ask';
+import wait from './util/wait';
+import input from './util/input';
 import fetch from './util/fetch';
+import extend from './util/extend';
+import url from './config/url';
 import AsideList from './component/aside-list';
 
 class Main extends React.Component {
@@ -22,7 +28,7 @@ class Main extends React.Component {
 	}
 
 	getDirTree () {
-		fetch.get('../data/dir-tree.json', {}).then(dirTree => {
+		fetch.get(url.tree, {}).then(dirTree => {
 			this.dirTree = dirTree;
 			this.cd(this.state.pathArr);
 		});
@@ -30,9 +36,7 @@ class Main extends React.Component {
 
 	getDirList (pathArr) {
 		let dirObj = this.dirTree;
-		pathArr.forEach(name => {
-			dirObj = dirObj[name];
-		});
+		pathArr.forEach(name => (dirObj = dirObj[name]));
 		let isPic = name => {
 			let lower = name.toLowerCase();
 			if (lower.includes('.jpg')) return true;
@@ -121,13 +125,68 @@ class Main extends React.Component {
 		let path = this.pwd();
 		if (!path) return;
 		let { md } = this.state;
-		fetch.post('../data/ok.json', { path, md });
+		fetch.post(url.save, { path, md });
 	}
 
-	sync () {}
-	niu () {}
+	sync () {
+		let w = wait('sync..');
+		fetch.post(url.save, { path, md }).then(() => w.destroy());
+	}
+
+	niu () {
+
+	}
+
 	rename () {}
-	del () {}
+
+	del () {
+		let { pathArr, dirList, index } = this.state;
+		if (!dirList.length) return;
+		let { name } = dirList[index];
+		let path = this.pwd();
+		if (!path) return;
+
+		ask(`DELETE ${name} ?`, () => {
+			let w = wait();
+			fetch.post(url.del, { path }).then(() => {
+				this.updateTree(name, 'del');
+				this.updateDirList(name, 'del');
+				this.changeChecked(0);
+				w.remove();
+			});
+		}); 
+	}
+
+	updateDirList (name, action, info) {
+		let _dirList = [];
+		let { dirList } = this.state; 
+		let index = 0;
+		if (action === 'del') {
+			_dirList = dirList.filter(o => (o.name === name));
+		}
+		if (action === 'add') {
+			_dirList = dirList.concat(type);
+		}
+		if (action === 'rename') {
+			_dirList = dirList.forEach(o => {
+				if (o.name !== name) return;
+				o.name = info;
+			});
+		}
+		setState({ dirList : _dirList });
+	}
+
+	updateTree (name, action, info) {
+		let dirObj = this.dirTree;
+		pathArr.forEach(k => (dirObj = dirObj[k]));
+		if (action === 'del') 	delete dirObj.name;
+		if (action === 'add') 	dirObj[name] = info;
+		if (action === 'rename') {
+			dirObj[info] = {};
+			extend(dirObj[info], dirObj[name]);
+			delete dirObj[name];
+		}  
+	}
 
 	handleMdChange (e) { this.setState({ md : e.currentTarget.value }); }
 
@@ -172,10 +231,18 @@ class Main extends React.Component {
 			<li 
 				className="back"
 				onClick={this.back.bind(this)}></li>
-			<li className="sync"></li>
-			<li className="add"></li>
-			<li className="rename"></li>
-			<li className="del"></li>
+			<li 
+				className="sync"
+				onClick={this.sync.bind(this)}></li>
+			<li 
+				className="add"
+				onClick={this.niu.bind(this)}></li>
+			<li 
+				className="rename"
+				onClick={this.rename.bind(this)}></li>
+			<li 
+				className="del"
+				onClick={this.del.bind(this)}></li>
 			<li 
 				className={this.state.editable ? 'hide' : 'edit'}
 				onClick={this.edit.bind(this)}></li>
