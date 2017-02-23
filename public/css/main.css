@@ -53,9 +53,9 @@ aside{
 	right:0;
 	background-image:url(../img/edit.png);
 }
-.aside-ctrl>.save{
+.aside-ctrl>.view{
 	right:0;
-	background-image:url(../img/save.png);
+	background-image:url(../img/view.png);
 }
 .aside-list{
 	position:absolute;

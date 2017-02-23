@@ -6,22 +6,19 @@ class Main extends React.Component {
 	constructor (props) {
 		super(props);
 		this.state = {
-			pathArr : ['root'],
+			pathArr : [],
 			dirList : null,
-			// dirList : [{
-			// 	type : 'repo',
-			// 	name : 'testtest'
-			// }],
 			index : -1,
 
 			md : '',
-			editable : false,
+			c : false,
 		};
 		this.dirTree = null;
 	}
 
 	componentDidMount () {
 		this.getDirTree();
+		window.addEventListener('keydown', this.handleKeyDown.bind(this));
 	}
 
 	getDirTree () {
@@ -51,36 +48,62 @@ class Main extends React.Component {
 		return dirList;
 	}
 
-	changeChecked (index) { this.setState({ index }); }
+	changeChecked (index) {
+		this.setState({	index, md : '',	editable : false, }); 
+		setTimeout(() => this.cat());
+	}
+
 
 	forward (index) {
-		let name = this.state.dirList[index].name;
-		let pathArr = this.state.pathArr.concat([name]);
+		let { dirList, pathArr } = this.state;
+		if (!dirList.length) return;
+		let name = dirList[index].name;
+		pathArr = pathArr.concat([name]);
 		this.cd(pathArr);
 	}
 
 	back () {
-		let len = this.state.pathArr.length;
-		if (len <= 1) return;
-		let pathArr = this.state.pathArr.slice(0, len - 1);
+		let { pathArr } = this.state;
+		if (!pathArr.length) return;
+		pathArr = pathArr.slice(0, pathArr.length - 1);
 		this.cd(pathArr);
+	}
+
+	home () { this.cd([]); }
+	jump (e) {
+		let i = e.currentTarget.getAttribute('data-i');
+		this.cd(this.state.pathArr.slice(0, i + 1));
 	}
 
 	cd (pathArr) {
 		let dirList = this.getDirList(pathArr);
-		let md = '';
-		this.setState({ pathArr, dirList, md });
+		this.setState({
+			pathArr,
+			dirList,
+			index : 0,
+			md : '',
+			editable : false
+		});
+		setTimeout(() => this.cat());
 	}
 
-	cat (index) {
-		let name = this.state.dirList[index];
-		let path = this.state.pathArr.join('/');
-		path = path.replace('root/', '../repo');
-		path += '/' + name
-		path = '../data/md.md';
+	cat () {
+		let { dirList, index } = this.state;
+		if (!dirList.length) return;
+		if (dirList[index].type !== 'file') return;
+		let path = this.pwd();
+		path = '../data/md.md'; //todo
 		fetch.getText(path, {}).then(md => {
 			this.setState({ md, editable : false })
 		});
+	}
+
+	pwd () {
+		let { pathArr, dirList, index } = this.state;
+		if (!dirList.length) return '';
+		let { name } = dirList[index];
+		let path = pathArr.join('/');
+		return `../repo/${path}/${name}`;
 	}
 
 	edit () {
@@ -88,16 +111,61 @@ class Main extends React.Component {
 		this.setState({ editable : true });
 	}
 
-	save () {
+	view () {
 		if (!this.state.editable) return;
+		this.save();
 		this.setState({ editable : false });
+	}
+
+	save () {
+		let path = this.pwd();
+		if (!path) return;
+		let { md } = this.state;
+		fetch.post('../data/ok.json', { path, md });
+	}
+
+	sync () {}
+	niu () {}
+	rename () {}
+	del () {}
+
+	handleMdChange (e) { this.setState({ md : e.currentTarget.value }); }
+
+	handleKeyDown (e) {
+		if (!e.ctrlKey) return;
+		let { dirList, index, editable } = this.state;
+		switch (e.key) {
+			case 'ArrowUp':
+				if (!index) return;
+				this.changeChecked(index - 1);
+				break;
+			case 'ArrowDown':
+				if (index >= dirList.length - 1) return;
+				this.changeChecked(index + 1);
+				break;
+			case 'b':
+				if (editable) 	this.view();
+				else 			this.edit();
+				break;
+
+			case 'Backspace': 	this.back(); 		break;
+			case 'Enter': 		this.forward(index);break;	
+			case 'F9': 			this.sync(); 		break;
+			case 'n': 			this.niu(); 		break;
+			case 'm': 			this.rename(); 		break;
+			case 'Delete':		this.del(); 		break;
+			case 's': 			e.preventDefault(); this.save(); break;
+		}		
 	}
 
 	render () {
 		return (
 <section className="full">
 	<header>
-		<a className="icon" target="_blank" href="https://github.com/sandii"></a>
+		<a 
+			className="icon" 
+			target="_blank" 
+			href="https://github.com/sandii"></a>
 	</header>
 	<aside>
 		<ul className="aside-ctrl">
@@ -112,8 +180,8 @@ class Main extends React.Component {
 				className={this.state.editable ? 'hide' : 'edit'}
 				onClick={this.edit.bind(this)}></li>
 			<li 
-				className={this.state.editable ? 'save' : 'hide'}
-				onClick={this.save.bind(this)}></li>
+				className={this.state.editable ? 'view' : 'hide'}
+				onClick={this.view.bind(this)}></li>
 		</ul>
 		<AsideList 
 			data={this.state.dirList}
@@ -123,20 +191,23 @@ class Main extends React.Component {
 			changeChecked={this.changeChecked.bind(this)} />
 	</aside>
 	<nav>
-		{this.state.pathArr.map(name => (
-			<span>{'/ '+ name}</span>
+		<span onClick={this.home.bind(this)}>/ ROOT / </span>
+		{this.state.pathArr.map((name, i) => (
+			<span 
+				data-i={i}
+				onClick={this.jump.bind(this)}>
+				{name +' / '}
+			</span>
 		))}
 	</nav>
-	<article>
-		<div dangerouslySetInnerHTML={{
-			__html : this.state.editable ? new Remarkable().render(this.state.md)
+	<article>{
+		this.state.editable ? <textarea
+			value={this.state.md}
+			onChange={this.handleMdChange.bind(this)}></textarea>
+		: <div dangerouslySetInnerHTML={{
+			__html : new Remarkable().render(this.state.md)
 		}}/>
-		{}
-		{ 
-			? this.state.md.replace('\n', '\n\r')
-			: 
-		}
-	</article>
+	}</article>
 </section>
 		);
 	}
