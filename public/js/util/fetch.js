@@ -23,6 +23,23 @@ let get = (url, param) => {
         req.send();
     });
 };
+let getText = (url, param) => {
+    return new Promise((resolve, reject) => {
+        let req = new XMLHttpRequest();
+        param = parseParam(param);
+        url = url +'?'+ param;
+        req.open('GET', url);
+        req.onreadystatechange = () => {
+            if (req.readyState !== 4 ) return;
+            if (req.status === 200 ) {
+                resolve(req.response);
+            }else{
+                reject();
+            }
+        }
+        req.send();
+    });
+};
 let post = (url, param) => {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
@@ -71,4 +88,4 @@ let getScript = (url, param) => {
     });
 };
 
-export default { get, post, jsonp, getScript };
+export default { get, post, jsonp, getScript, getText };

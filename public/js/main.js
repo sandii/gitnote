@@ -13,6 +13,9 @@ class Main extends React.Component {
 			// 	name : 'testtest'
 			// }],
 			index : -1,
+
+			md : '',
+			editable : false,
 		};
 		this.dirTree = null;
 	}
@@ -24,8 +27,7 @@ class Main extends React.Component {
 	getDirTree () {
 		fetch.get('../data/dir-tree.json', {}).then(dirTree => {
 			this.dirTree = dirTree;
-			let dirList = this.getDirList(this.state.pathArr);
-			this.setState({ dirList });
+			this.cd(this.state.pathArr);
 		});
 	}
 
@@ -54,19 +56,42 @@ class Main extends React.Component {
 	forward (index) {
 		let name = this.state.dirList[index].name;
 		let pathArr = this.state.pathArr.concat([name]);
-		let dirList = this.getDirList(pathArr);
-		this.setState({ pathArr, dirList });
+		this.cd(pathArr);
 	}
 
 	back () {
 		let len = this.state.pathArr.length;
 		if (len <= 1) return;
 		let pathArr = this.state.pathArr.slice(0, len - 1);
-		let dirList = this.getDirList(pathArr);
-		this.setState({ pathArr, dirList });
+		this.cd(pathArr);
 	}
 
-	cat (index) {}
+	cd (pathArr) {
+		let dirList = this.getDirList(pathArr);
+		let md = '';
+		this.setState({ pathArr, dirList, md });
+	}
+
+	cat (index) {
+		let name = this.state.dirList[index];
+		let path = this.state.pathArr.join('/');
+		path = path.replace('root/', '../repo');
+		path += '/' + name
+		path = '../data/md.md';
+		fetch.getText(path, {}).then(md => {
+			this.setState({ md, editable : false })
+		});
+	}
+
+	edit () {
+		if (this.state.editable) return;
+		this.setState({ editable : true });
+	}
+
+	save () {
+		if (!this.state.editable) return;
+		this.setState({ editable : false });
+	}
 
 	render () {
 		return (
@@ -83,7 +108,12 @@ class Main extends React.Component {
 			<li className="add"></li>
 			<li className="rename"></li>
 			<li className="del"></li>
-			<li className="edit"></li>
+			<li 
+				className={this.state.editable ? 'hide' : 'edit'}
+				onClick={this.edit.bind(this)}></li>
+			<li 
+				className={this.state.editable ? 'save' : 'hide'}
+				onClick={this.save.bind(this)}></li>
 		</ul>
 		<AsideList 
 			data={this.state.dirList}
@@ -97,7 +127,16 @@ class Main extends React.Component {
 			<span>{'/ '+ name}</span>
 		))}
 	</nav>
-	<article></article>
+	<article>
+		<div dangerouslySetInnerHTML={{
+			__html : this.state.editable ? new Remarkable().render(this.state.md)
+		}}/>
+		{}
+		{ 
+			? this.state.md.replace('\n', '\n\r')
+			: 
+		}
+	</article>
 </section>
 		);
 	}

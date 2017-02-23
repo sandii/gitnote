@@ -3,16 +3,25 @@ article{
 	top:120px; left:300px; right:0; bottom:0;
 	padding:30px;
 	background-color:#111;
-	font-family:Helvetica, Arial, sans-serif; font-size:100%; line-height:1.3;
+	font-family:"微软雅黑", Helvetica, Arial, sans-serif; font-size:120%; line-height:1.3;
 	color:#f6e6cc; background: #27221a;
 	overflow-x:hidden; overflow-y:scroll;
 }
+article code{
+	background:rgba(0,0,0,0.7);
+	padding:2px 5px; border-radius:2px; margin:0 5px;
+}
+article pre code{background:none; margin:0;}
+article ol li{list-style-type:decimal;}
+article ul li{list-style-type:disc;}
 article p,
+article li{margin:0.2em 0;}
 article ul,
 article ol,
 article dl,
 article table,
-article pre {margin-bottom:0.5em;}
+article pre {margin:1em 0;}
+article ol,
 article ul{margin-left:20px;}
 article a{
 	text-decoration:none; font-weight: bold;
@@ -83,7 +92,7 @@ article h1 a:hover{
 	font-weight:normal; text-decoration:none;
 }
 article pre{
-	background:rgba(0,0,0,0.3); color:#fff;
+	background:rgba(0,0,0,0.3); color:#e0e0e0;
 	padding:8px 10px; border-radius:0.4em;
 	overflow-x: hidden;
 }

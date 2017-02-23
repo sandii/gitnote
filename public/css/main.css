@@ -53,6 +53,10 @@ aside{
 	right:0;
 	background-image:url(../img/edit.png);
 }
+.aside-ctrl>.save{
+	right:0;
+	background-image:url(../img/save.png);
+}
 .aside-list{
 	position:absolute;
 	top:40px; left:0; right:0; bottom:0;
