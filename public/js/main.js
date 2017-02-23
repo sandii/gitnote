@@ -24,33 +24,29 @@ class Main extends React.Component {
 	getDirTree () {
 		fetch.get('../data/dir-tree.json', {}).then(dirTree => {
 			this.dirTree = dirTree;
-			this.updateDirList(this.getDirObj());
+			let dirList = this.getDirList(this.state.pathArr);
+			this.setState({ dirList });
 		});
 	}
 
-	getDirObj () {
-		let obj = this.dirTree;
-		this.state.pathArr.forEach(name => {
-			obj = obj[name];
+	getDirList (pathArr) {
+		let dirObj = this.dirTree;
+		pathArr.forEach(name => {
+			dirObj = dirObj[name];
 		});
-		return obj;
-	}
-
-	updateDirList (dirObj) {
-		let dirList = [];
 		let isPic = name => {
 			let lower = name.toLowerCase();
 			if (lower.includes('.jpg')) return true;
 			if (lower.includes('.png')) return true;
 			return false;
 		};
+		let dirList = [];
 		for (let name in dirObj) {
 			let type = dirObj[name] ? 'dir' : 'file';
 			type = type === 'file' && isPic(name) ? 'pic' : type;
 			dirList.push({ type, name });
 		}
-		this.setState({ dirList });
-
+		return dirList;
 	}
 
 	changeChecked (index) { this.setState({ index }); }
@@ -58,16 +54,16 @@ class Main extends React.Component {
 	forward (index) {
 		let name = this.state.dirList[index].name;
 		let pathArr = this.state.pathArr.concat([name]);
-		this.setState({ pathArr });
-		this.updateDirList(this.getDirObj());
+		let dirList = this.getDirList(pathArr);
+		this.setState({ pathArr, dirList });
 	}
 
 	back () {
 		let len = this.state.pathArr.length;
 		if (len <= 1) return;
-		let pathArr = this.state.pathArr.slice(0, len - 2);
-		this.setState({ pathArr });
-		this.updateDirList(this.getDirObj());
+		let pathArr = this.state.pathArr.slice(0, len - 1);
+		let dirList = this.getDirList(pathArr);
+		this.setState({ pathArr, dirList });
 	}
 
 	cat (index) {}
@@ -97,11 +93,9 @@ class Main extends React.Component {
 			changeChecked={this.changeChecked.bind(this)} />
 	</aside>
 	<nav>
-		/ <span>root</span>
-		/ <span>repo</span>
-		/ <span>dir</span>
-		/ <span>file</span>
-		/
+		{this.state.pathArr.map(name => (
+			<span>{'/ '+ name}</span>
+		))}
 	</nav>
 	<article></article>
 </section>

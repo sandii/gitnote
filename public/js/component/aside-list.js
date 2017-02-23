@@ -22,7 +22,6 @@ function AsideList (props) {
 		if (className.includes('dir')) props.forward(index);
 		if (className.includes('rep')) props.forward(index);
 		if (className.includes('file'))props.cat(index);
-
 	}
 
 	return (<ul className="aside-list">{items}</ul>);
