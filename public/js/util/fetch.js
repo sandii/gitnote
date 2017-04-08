@@ -1,21 +1,14 @@
-let parseParam = o => {
-    let arr = [];
-    for (let k in o) {
-        arr.push(`${k}=${o[k]}`);
-    }
-    return arr.join('&');
+const parseParam = o => {
+    return Object.keys(o).map(k => k +'='+ o[k]).join('&');
 };
-let get = (url, param) => {
+const get = (url, param) => {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
-        param = parseParam(param);
-        url = url +'?'+ param;
-        req.open('GET', url);
+        req.open('GET', url +'?'+ parseParam(param));
         req.onreadystatechange = () => {
-            if (req.readyState !== 4 ) return;
-            if (req.status === 200 ) {
-                let data = JSON.parse(req.response);
-                resolve(data);
+            if (req.readyState !== 4) return;
+            if (req.status === 200) {
+                resolve(JSON.parse(req.response));
             }else{
                 reject();
             }
@@ -23,15 +16,13 @@ let get = (url, param) => {
         req.send();
     });
 };
-let getText = (url, param) => {
+const getText = (url, param) => {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
-        param = parseParam(param);
-        url = url +'?'+ param;
-        req.open('GET', url);
+        req.open('GET', url +'?'+ parseParam(param));
         req.onreadystatechange = () => {
-            if (req.readyState !== 4 ) return;
-            if (req.status === 200 ) {
+            if (req.readyState !== 4) return;
+            if (req.status === 200) {
                 resolve(req.response);
             }else{
                 reject();
@@ -40,7 +31,7 @@ let getText = (url, param) => {
         req.send();
     });
 };
-let post = (url, param) => {
+const post = (url, param) => {
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
         req.open('POST', url);
@@ -48,8 +39,7 @@ let post = (url, param) => {
         req.onreadystatechange = () => {
             if (req.readyState !== 4 ) return;
             if (req.status === 200 ) {
-                let data = JSON.parse(req.response);
-                resolve(data);
+                resolve(JSON.parse(req.response));
             }else{
                 reject();
             }
@@ -59,7 +49,7 @@ let post = (url, param) => {
     });
 };
 let jsonpId = 0;
-let jsonp = (url, param) => {
+const jsonp = (url, param) => {
     return new Promise((resolve, reject) => {
         let script = document.createElement('script');
         document.body.appendChild(script);
@@ -78,7 +68,7 @@ let jsonp = (url, param) => {
         script.src = url +'?'+ parseParam(param);
     });
 };
-let getScript = (url, param) => {
+const getScript = (url, param) => {
     return new Promise((resolve, reject) => {
         let script = document.createElement('script');
         document.body.appendChild(script);

@@ -3,7 +3,6 @@ import ask from './util/ask';
 import wait from './util/wait';
 import input from './util/input';
 import fetch from './util/fetch';
-import extend from './util/extend';
 import url from './config/url';
 import AsideList from './component/aside-list';
 
@@ -17,14 +16,16 @@ class Main extends React.Component {
 			index : -1,
 
 			md : '',
-			c : false,
+			c : false,  
 		};
 		this.dirTree = null;
+		this.textarea = null;
 	}
 
 	componentDidMount () {
 		this.getDirTree();
-		window.addEventListener('keydown', this.handleKeyDown.bind(this));
+		document.addEventListener('keydown', this.iconShortcut.bind(this));
+		document.addEventListener('keydown', this.listShortcut.bind(this));
 	}
 
 	getDirTree () {
@@ -57,10 +58,13 @@ class Main extends React.Component {
 		setTimeout(() => this.cat());
 	}
 
-
 	forward (index) {
 		let { dirList, pathArr } = this.state;
 		if (!dirList.length) return;
+		let ul = document.querySelector('.aside-list');
+		let { className } = ul.childNodes[index];
+		if (className.includes('file')) return;
+		if (className.includes('pic'))  return;
 		let name = dirList[index].name;
 		pathArr = pathArr.concat([name]);
 		this.cd(pathArr);
@@ -95,24 +99,33 @@ class Main extends React.Component {
 		let { dirList, index } = this.state;
 		if (!dirList.length) return;
 		if (dirList[index].type !== 'file') return;
-		let path = this.pwd();
-		path = '../data/md.md'; //todo
-		fetch.getText(path, {}).then(md => {
-			this.setState({ md, editable : false })
+		let pathname = this.pwd();
+		pathname = encodeURIComponent(pathname);
+		fetch.get(url.cat, { pathname }).then(d => {
+			if (d.code === 0) {
+				this.setState({ md : d.content, editable : false })
+			} else {
+				tip(d.err);
+			}
 		});
 	}
 
 	pwd () {
 		let { pathArr, dirList, index } = this.state;
-		if (!dirList.length) return '';
-		let { name } = dirList[index];
+		let name = dirList.length ? dirList[index].name : '';
 		let path = pathArr.join('/');
-		return `../repo/${path}/${name}`;
+		return `${path}/${name}`;
 	}
 
 	edit () {
-		if (this.state.editable) return;
+		let { dirList, index, editable } = this.state;
+		if (!dirList.length) return;
+		if (dirList[index].type !== 'file') return;
+		if (editable) return;
 		this.setState({ editable : true });
+		setTimeout(() => {
+			this.textarea.focus();
+		}, 0);
 	}
 
 	view () {
@@ -122,99 +135,196 @@ class Main extends React.Component {
 	}
 
 	save () {
-		let path = this.pwd();
-		if (!path) return;
+		let { editable, dirList, index } = this.state;
+		if (!editable) return;
+		if (dirList[index].type !== 'file') return;
+		let pathname = this.pwd();
+		if (!pathname) return;
 		let { md } = this.state;
-		fetch.post(url.save, { path, md });
+		md = encodeURIComponent(md);
+		fetch.get(url.save, { pathname, md });
 	}
 
 	sync () {
-		let w = wait('sync..');
-		fetch.post(url.save, { path, md }).then(() => w.destroy());
+		wait('sync..');
+		fetch.get(url.sync, {}).then(d => {
+			wait.remove();
+			tip(d.code === 0 ? 'Sync success! '+ d.msg : d.msg, 30000);
+		});
 	}
 
-	niu () {
-
+	newfile () {
+		input('new file', '', name => {
+			if (this.nameExist(name)) return;
+			let pathname = this.pwd();
+			let index = pathname.lastIndexOf('/');
+			pathname = pathname.slice(0, index);
+			pathname += '/'+ name;
+			fetch.get(url.newfile, { pathname }).then(() => {
+				this.updateTree(name, 'add', null);
+				this.updateDirList(name, 'add', {type : 'file', name });
+			});
+		});
 	}
 
-	rename () {}
+	newdir () {
+		input('new directory', '', name => {
+			if (this.nameExist(name)) return;
+			let pathname = this.pwd();
+			let index = pathname.lastIndexOf('/');
+			pathname = pathname.slice(0, index);
+			pathname += '/'+ name;
+			fetch.get(url.newdir, { pathname }).then(() => {
+				this.updateTree(name, 'add', {});
+				this.updateDirList(name, 'add', {type : 'dir', name });
+			});
+		});
+	}
 
-	del () {
-		let { pathArr, dirList, index } = this.state;
+	rename () {
+		let { dirList, index } = this.state;
 		if (!dirList.length) return;
 		let { name } = dirList[index];
-		let path = this.pwd();
-		if (!path) return;
+		input('rename', name, newname => {
+			if (this.nameExist(newname)) return;
+			let pathname = this.pwd();
+			fetch.get(url.rename, { pathname, newname }).then(d => {
+				if (d.code === 0) {
+					this.updateTree(name, 'rename', newname);
+					this.updateDirList(name, 'rename', newname);
+				} else {
+					console.log(d.err);
+				}
+			});
+		});
+	}
+
+	nameExist (name) {
+		for (let o of this.state.dirList) {
+			if (o.name === name) return true;
+		}
+		return false;
+	}
+
+	del () {
+		let { dirList, index } = this.state;
+		if (!dirList.length) return;
+		let { name } = dirList[index];
+		let pathname = this.pwd();
+		if (!pathname) return;
 
 		ask(`DELETE ${name} ?`, () => {
-			let w = wait();
-			fetch.post(url.del, { path }).then(() => {
+			fetch.get(url.del, { pathname }).then(() => {
 				this.updateTree(name, 'del');
 				this.updateDirList(name, 'del');
 				this.changeChecked(0);
-				w.remove();
 			});
 		}); 
 	}
 
-	updateDirList (name, action, info) {
-		let _dirList = [];
-		let { dirList } = this.state; 
-		let index = 0;
-		if (action === 'del') {
-			_dirList = dirList.filter(o => (o.name === name));
-		}
-		if (action === 'add') {
-			_dirList = dirList.concat(type);
-		}
-		if (action === 'rename') {
-			_dirList = dirList.forEach(o => {
-				if (o.name !== name) return;
-				o.name = info;
-			});
-		}
-		setState({ dirList : _dirList });
-	}
-
 	updateTree (name, action, info) {
 		let dirObj = this.dirTree;
-		pathArr.forEach(k => (dirObj = dirObj[k]));
-		if (action === 'del') 	delete dirObj.name;
+		this.state.pathArr.forEach(k => (dirObj = dirObj[k]));
+		if (action === 'del') 	delete dirObj[name];
 		if (action === 'add') 	dirObj[name] = info;
 		if (action === 'rename') {
-			dirObj[info] = {};
-			extend(dirObj[info], dirObj[name]);
+			dirObj[info] = dirObj[name];
 			delete dirObj[name];
-		}  
+		}
+	}
+
+	updateDirList (name, action, info) {
+		let _dirList = [];
+		let { dirList } = this.state;
+		if (action === 'del') {
+			_dirList = dirList.filter(o => (o.name !== name));
+		}
+		if (action === 'add') {
+			_dirList = dirList.concat(info);
+		}
+		if (action === 'rename') {
+			_dirList = dirList.map(o => {
+				if (o.name === name) o.name = info;
+				return o;
+			});
+		}
+		this.setState({ dirList : _dirList });
 	}
 
 	handleMdChange (e) { this.setState({ md : e.currentTarget.value }); }
 
-	handleKeyDown (e) {
-		if (!e.ctrlKey) return;
-		let { dirList, index, editable } = this.state;
+	handleAreaKeydown (e) {
+		if (e.keyCode !== 9) return;
+		let str = '    ';
+		let obj = e.currentTarget;
+        if (document.selection) {
+            var sel = document.selection.createRange();  
+            sel.text = str;  
+        } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') {  
+            var startPos = obj.selectionStart,  
+                endPos = obj.selectionEnd,  
+                cursorPos = startPos,  
+                tmpStr = obj.value;  
+            obj.value = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);  
+            cursorPos += str.length;  
+            obj.selectionStart = obj.selectionEnd = cursorPos;  
+        } else {  
+            obj.value += str;  
+        }
+        this.stopEvent(e);
+	}
+
+	iconShortcut (e) {
+		if (e.ctrlKey && e.key === 's') {
+			this.stopEvent(e);
+			this.save();
+		}
+		if (!e.altKey) return;
+		let { editable } = this.state;
 		switch (e.key) {
-			case 'ArrowUp':
-				if (!index) return;
-				this.changeChecked(index - 1);
-				break;
-			case 'ArrowDown':
-				if (index >= dirList.length - 1) return;
-				this.changeChecked(index + 1);
-				break;
-			case 'b':
+			case 'e':
+				this.stopEvent(e);
 				if (editable) 	this.view();
 				else 			this.edit();
 				break;
+			case 'F9': 	this.stopEvent(e); this.sync(); 	break;
+			case 'n': 	this.stopEvent(e); this.newfile();	break;
+			case 'm': 	this.stopEvent(e); this.newdir(); 	break;
+			case 'r': 	this.stopEvent(e); this.rename(); 	break;
+			case 'd':	this.stopEvent(e); this.del(); 		break;
+			case 's': 	this.stopEvent(e); this.save(); 	break;
+		}
+	}
 
-			case 'Backspace': 	this.back(); 		break;
-			case 'Enter': 		this.forward(index);break;	
-			case 'F9': 			this.sync(); 		break;
-			case 'n': 			this.niu(); 		break;
-			case 'm': 			this.rename(); 		break;
-			case 'Delete':		this.del(); 		break;
-			case 's': 			e.preventDefault(); this.save(); break;
-		}		
+	listShortcut (e) {
+		let { dirList, index, editable } = this.state;
+		if (editable) return;
+		let len = dirList.length;
+		switch (e.key) {
+			case 'ArrowUp':
+				if (!len) return;
+				this.stopEvent(e);
+				this.changeChecked(index ? index - 1 : len - 1);
+				break;
+			case 'ArrowDown':
+				if (!len) return;
+				this.stopEvent(e);
+				this.changeChecked(index === len - 1 ? 0 : index + 1);
+				break;
+			case 'Backspace': 	this.stopEvent(e); this.back(); 		break;
+			case 'Enter': 		this.stopEvent(e); this.forward(index);	break;	
+		}
+
+		let num = Number(e.key);
+		if (isNaN(num)) return;
+		if (num === 0 || num > len) return;
+		this.changeChecked(num - 1);
+		this.stopEvent(e);
+	}
+
+	stopEvent (e) {
+		e.preventDefault();
+		e.stopPropagation();
 	}
 
 	render () {
@@ -230,24 +340,35 @@ class Main extends React.Component {
 		<ul className="aside-ctrl">
 			<li 
 				className="back"
+				title="back - Backspace"
 				onClick={this.back.bind(this)}></li>
 			<li 
 				className="sync"
+				title="sync - Alt+F9"
 				onClick={this.sync.bind(this)}></li>
 			<li 
-				className="add"
-				onClick={this.niu.bind(this)}></li>
+				className="newfile"
+				title="newfile - Alt+n"
+				onClick={this.newfile.bind(this)}></li>
+			<li 
+				className="newdir"
+				title="newdir - Alt+m"
+				onClick={this.newdir.bind(this)}></li>
 			<li 
 				className="rename"
+				title="rename - Alt+r"
 				onClick={this.rename.bind(this)}></li>
 			<li 
 				className="del"
+				title="del - Alt+d"
 				onClick={this.del.bind(this)}></li>
 			<li 
 				className={this.state.editable ? 'hide' : 'edit'}
+				title="edit - Alt+e"
 				onClick={this.edit.bind(this)}></li>
 			<li 
 				className={this.state.editable ? 'view' : 'hide'}
+				title="view - Alt+e"
 				onClick={this.view.bind(this)}></li>
 		</ul>
 		<AsideList 
@@ -270,7 +391,9 @@ class Main extends React.Component {
 	<article>{
 		this.state.editable ? <textarea
 			value={this.state.md}
-			onChange={this.handleMdChange.bind(this)}></textarea>
+			onChange={this.handleMdChange.bind(this)}
+			onKeydown={this.handleAreaKeydown.bind(this)}
+			ref={textarea => this.textarea = textarea}></textarea>
 		: <div dangerouslySetInnerHTML={{
 			__html : new Remarkable().render(this.state.md)
 		}}/>

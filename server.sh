@@ -1,3 +1,0 @@
-NODE_ENV=DEBUG node webpack-server
-echo Press ENTER to quit...
-read

@@ -32,12 +32,13 @@ function ask (
 	let keydownHandler = e => {
 		if (e.key === 'Enter') 	{ okftn(); remove(); }
 		if (e.key === 'Escape')	{ noftn(); remove(); }
+		e.stopPropagation();
 	}
-	document.addEventListener('keydown', keydownHandler, false);
+	document.body.addEventListener('keydown', keydownHandler, false);
 	function remove () {
 		if (!sect.parentNode) return;
 		sect.parentNode.removeChild(sect);
-		document.removeEventListener('keydown', keydownHandler);
+		document.body.removeEventListener('keydown', keydownHandler);
 	}
 };
 export default ask;

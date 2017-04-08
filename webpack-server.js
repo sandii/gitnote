@@ -9,16 +9,8 @@ new WebpackDevServer(webpack(config), {
   hot: true,
   historyApiFallback: true,
   proxy: {
-    '/city': {
-      target: 'http://m.gugusuyun.com',
-      changeOrigin: true
-    },
-    '/test': {
-      target: 'http://chenzhi.bid:9000',
-      changeOrigin: true
-    },
-    '/OneMenu' : {
-      target : 'http://172.18.24.35:8080',
+    '/file': {
+      target: 'http://localhost:9000',
       changeOrigin: true
     }
   },

@@ -5,6 +5,7 @@ function AsideList (props) {
 		return (
 			<li 
 				className={o.type + checked}
+				title={o.name}
 				data-i={i}
 				onClick={handleClick}>{o.name}</li>
 		);

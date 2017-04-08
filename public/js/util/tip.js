@@ -1,4 +1,4 @@
-function tip (t) {
+function tip (t, delay = 5000) {
 	let text = document.createTextNode(t);
 	let span = document.createElement('span');
 	let sect = document.createElement('section');
@@ -7,12 +7,13 @@ function tip (t) {
 	sect.appendChild(span);
 	document.body.appendChild(sect);
 
-	let timer = setTimeout(remove, 1500);
+	let timer = setTimeout(remove, delay);
 	sect.addEventListener('click', remove, false);
-	document.addEventListener('keydown', remove, false);
-	function remove () {
+	document.body.addEventListener('keydown', remove, false);
+	function remove (e) {
 		clearTimeout(timer);
-		document.removeEventListener('keydown', remove);
+		if (e) e.stopPropagation();
+		document.body.removeEventListener('keydown', remove);
 		if (!sect.parentNode) return;
 		sect.parentNode.removeChild(sect);
 	}

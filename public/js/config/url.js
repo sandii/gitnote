@@ -1,8 +1,10 @@
 export default {
-	tree : '../data/tree.json',
-	save : '../data/ok.json',
-	sync : '../data/ok.json',
-	niu : '../data/ok.json',
-	rename : '../data/ok.json',
-	del : '../data/ok.json',
+	tree 	: '/file/tree',
+	cat 	: '/file/cat',
+	save 	: '/file/save',
+	sync 	: '/file/sync',
+	newfile : '/file/newfile',
+	newdir 	: '/file/newdir',
+	rename 	: '/file/rename',
+	del 	: '/file/del',
 };

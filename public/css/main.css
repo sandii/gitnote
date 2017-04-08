@@ -34,12 +34,16 @@ aside{
 	background-image:url(../img/back.png);
 }
 .aside-ctrl>.sync{
-	right:160px;
+	right:200px;
 	background-image:url(../img/sync.png);
 }
-.aside-ctrl>.add{
+.aside-ctrl>.newdir{
+	right:160px;
+	background-image:url(../img/newdir.png);
+}
+.aside-ctrl>.newfile{
 	right:120px;
-	background-image:url(../img/add.png);
+	background-image:url(../img/newfile.png);
 }
 .aside-ctrl>.rename{
 	right:80px;
@@ -62,15 +66,26 @@ aside{
 .aside-list{
 	position:absolute;
 	top:40px; left:0; right:0; bottom:0;
-	overflow-x:hidden; overflow-y:scroll;
+	overflow-x:hidden; overflow-y:auto;
+	counter-reset:a;
 }
 .aside-list>li{
-	height:40px; line-height:40px; padding:0 40px;
-	background:no-repeat 10px center/20px auto; 
+	position:relative;
+	height:40px; line-height:40px; padding:0 40px 0 45px;
+	background:no-repeat 15px center/20px auto; 
 	opacity:0.9;
 	cursor:pointer; overflow:hidden; 
 }
+.aside-list>li:before{
+	position:absolute;
+	top:5px; left:-3px; width:15px; height:15px; line-height:15px;
+	color:#a2a2a2;
+	text-align:right;
+	transform: scaleX(0.8) scaleY(0.8);
+	content:counter(a); counter-increment:a;
+}
 .aside-list>.checked{background-color:#808080;}
+.aside-list>.checked:before{color:#e0e0e0;}
 .aside-list>.repo{background-image:url(../img/repo.png);}
 .aside-list>.dir{background-image:url(../img/dir.png);}
 .aside-list>.pic{background-image:url(../img/pic.png);}
