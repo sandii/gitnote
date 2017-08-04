@@ -255,7 +255,7 @@ class Main extends React.Component {
 
 	handleAreaKeydown (e) {
 		if (e.keyCode !== 9) return;
-		let str = '    ';
+		let str = '  ';
 		let obj = e.currentTarget;
         if (document.selection) {
             var sel = document.selection.createRange();  
