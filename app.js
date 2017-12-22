@@ -6,9 +6,6 @@ const fileRouter = require('./router/file');
 const app = express();
 app.listen(9000);
 
-if (!fs.statSync('./repos').isDirectory()) {
-	fs.mkdirSync('./repos');
-}
 app.use('/public', express.static('./public'));
 app.use('/repos',  express.static('./repos'));
 app.use('/file', fileRouter);
