@@ -124,6 +124,7 @@ class Main extends React.Component {
 		if (editable) return;
 		this.setState({ editable : true });
 		setTimeout(() => {
+			this.textarea.spellcheck = false;
 			this.textarea.focus();
 		}, 0);
 	}
