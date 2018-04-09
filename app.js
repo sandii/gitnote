@@ -14,6 +14,5 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 const DEBUG = process.env.NODE_ENV === 'DEBUG';
-console.log(process.env.NODE_ENV, 111);
 const port = DEBUG ? 3000 : 9000;
 opn('http://localhost:'+ port +'/public/main-dev.html');
