@@ -16,7 +16,7 @@ header>.icon{
 }
 aside{
 	position:absolute;
-	top:60px; left:0; bottom:0; width:300px;
+	top:0px; left:0; bottom:0; width:300px;
 	background:black;
 }
 .aside-ctrl{
@@ -92,7 +92,7 @@ aside{
 .aside-list>.file{background-image:url(../img/file.png);}
 nav{
 	position:absolute;
-	top:60px; left:300px; right:0; height:60px; line-height:60px;
+	top:0px; left:300px; right:0; height:60px; line-height:60px;
 	padding-left:40px;
 	background-color:#111; color:#b3b3b3;
 }
