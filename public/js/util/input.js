@@ -30,6 +30,7 @@ function input (
 	sect.appendChild(wrap);
 	document.body.appendChild(sect);
 	input.value = value;
+	input.spellcheck = false;
 	input.focus();
 	
 	let okcbk = () => {

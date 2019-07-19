@@ -4,7 +4,7 @@ body{font-size:1.4rem; font-family:"微软雅黑"; background:black; color:white
 body, div, dl, dt, dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td,input,em{margin:0;padding:0;}
 table{border-collapse:collapse;border-spacing:0;}
 fieldset,img{border:none;}
-address,caption, cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}
+/*address,caption, cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}*/
 ol,ul,li{list-style-type:none;}
 caption,th{text-align:left;}
 h1,h2,h3,h4,h5,h6{font-size:1rem;font-weight:normal;}
