@@ -1,15 +1,10 @@
-const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
 const DEBUG = process.env.NODE_ENV === 'DEBUG';
-console.log( process.env.NODE_ENV || 'BUILDING BEGINS');
+console.log(process.env.NODE_ENV || 'BUILDING BEGINS');
 const devHost = 'localhost';
 const devPort = 3000;
-const serverEntry = DEBUG ? [
-	`webpack-dev-server/client?http://${devHost}:${devPort}`,
-	'webpack/hot/only-dev-server'
-] : [];
 
 const config = {
 	entry : [path.join(__dirname, './public/js/main.js')],

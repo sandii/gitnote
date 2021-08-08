@@ -282,18 +282,18 @@ class Main extends React.Component {
 		}
 		if (!e.altKey) return;
 		let { editable } = this.state;
-		switch (e.key) {
-			case 'e':
+		switch (e.keyCode) {
+			case 69: // e
 				this.stopEvent(e);
 				if (editable) 	this.view();
 				else 			this.edit();
 				break;
-			case 'F9': 	this.stopEvent(e); this.sync(); 	break;
-			case 'n': 	this.stopEvent(e); this.newfile();	break;
-			case 'm': 	this.stopEvent(e); this.newdir(); 	break;
-			case 'r': 	this.stopEvent(e); this.rename(); 	break;
-			case 'd':	this.stopEvent(e); this.del(); 		break;
-			case 's': 	this.stopEvent(e); this.save(); 	break;
+			case 120: 	this.stopEvent(e); this.sync(); 	break; // f9
+			case 78: 	this.stopEvent(e); this.newfile();	break; // n
+			case 77: 	this.stopEvent(e); this.newdir(); 	break; // m
+			case 82: 	this.stopEvent(e); this.rename(); 	break; // r
+			case 68:	this.stopEvent(e); this.del(); 		break; // d
+			case 83: 	this.stopEvent(e); this.save(); 	break; // s
 		}
 	}
 

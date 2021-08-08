@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const config = require('./webpack.config');
@@ -14,7 +13,7 @@ new WebpackDevServer(webpack(config), {
       changeOrigin: true
     }
   },
-}).listen(config.devPort, config.devHost, (err, result) => {
+}).listen(config.devPort, config.devHost, err => {
   if (err) return console.log(err);
   console.log(`Listening http://${config.devHost}:${config.devPort}/`);
 });

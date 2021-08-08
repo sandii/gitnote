@@ -75,6 +75,7 @@ aside{
 	background:no-repeat 15px center/20px auto; 
 	opacity:0.9;
 	cursor:pointer; overflow:hidden; 
+	white-space:nowrap; text-overflow:ellipsis;
 }
 .aside-list>li:before{
 	position:absolute;
