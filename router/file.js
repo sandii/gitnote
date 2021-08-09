@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const child_process = require('child_process');
 const express = require('express');
-const prom = require('../lib/prom');
+const command = require('../lib/command');
 const fileRouter = express.Router();
 const base = './repos/';
 
@@ -98,24 +98,33 @@ fileRouter.get('/save', (req, res) => {
 
 fileRouter.get('/sync', (req, res) => {
 	let cmds = fs.readdirSync(base).map(name => {
-		// let pathname = path.join(process.cwd(), base, name);
+		let pathname = path.join(process.cwd(), base, name);
 		return [
-			// `cd ${pathname}`,
+			`cd ${pathname}`,
 			'git add -A',
-			// 'git commit -m \"update\"',
-			// 'git fetch',
-			// 'git rebase origin/master',
-			// 'git push origin master',
+			'git commit -m "update"',
+			'git fetch',
+			'git rebase origin/master',
+			'git push origin master',
 		].join(' && ');
 	});	
-	console.log(cmds);
-	Promise.all(
-		cmds.map(cmd => prom.exec(cmd))
-	).then(stdouts => {
-		res.send({code : 0, msg : stdouts});
-	}).catch((err, stderr) => {
-		res.send({code : -1, err, msg : stderr});
-	});
+	Promise
+		.all(
+			cmds.map(cmd => command(cmd))
+		)
+		.then(stdout => {
+			res.send({
+				code: 0,
+				msg: stdout,
+			});
+		})
+		.catch((err, stderr) => {
+			res.send({
+				code : -1,
+				err,
+				msg : stderr
+			});
+		});
 });
 
 module.exports = fileRouter;
