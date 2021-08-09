@@ -102,7 +102,7 @@ fileRouter.get('/sync', (req, res) => {
 		return [
 			// `cd ${pathname}`,
 			'git add -A',
-			'git commit -m \"update\"',
+			// 'git commit -m \"update\"',
 			// 'git fetch',
 			// 'git rebase origin/master',
 			// 'git push origin master',
