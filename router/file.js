@@ -99,7 +99,7 @@ fileRouter.get('/save', (req, res) => {
 fileRouter.get('/sync', (req, res) => {
 	let cmds = fs.readdirSync(base).map(name => {
 		let pathname = path.join(base, name);
-		return `cd ${pathname} & git add -A & git commit -m update & git fetch && git rebase & git push origin master`;
+		return `cd ${pathname} & git add -A & git commit -m update & git fetch && git rebase origin/master & git push origin master`;
 	});
 	Promise.all(
 		cmds.map(cmd => prom.exec(cmd))
