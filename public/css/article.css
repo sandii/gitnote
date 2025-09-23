@@ -3,7 +3,7 @@ article{
 	top:60px; left:300px; right:0; bottom:0;
 	padding:0 30px;
 	background-color:#111;
-	font-family:Consolas,"微软雅黑", Helvetica, Arial, sans-serif; font-size:1.6rem; line-height:1.5rem;
+	font-family:Consolas,"微软雅黑", Helvetica, Arial, sans-serif; font-size:1rem; line-height:1rem;
 	color:#f6e6cc; background: #27221a;
 	overflow-x:hidden; overflow-y:auto;
 }
@@ -102,11 +102,11 @@ article h5:first-child,
 article h6:first-child{ 
    margin-top:0;
 }
-article h2{font-size:3rem; margin-top:40px;}
-article h3{font-size:2.8rem; margin-top:35px;}
-article h4{font-size:2.6rem; margin-top:30px;}
-article h5{font-size:2.4rem; margin-top:25px;}
-article h6{font-size:2.2rem; margin-top:20px;}
+article h2{font-size:2rem; margin-top:40px;}
+article h3{font-size:1.8rem; margin-top:35px;}
+article h4{font-size:1.6rem; margin-top:30px;}
+article h5{font-size:1.4rem; margin-top:25px;}
+article h6{font-size:1.2rem; margin-top:20px;}
 
 article ::selection {background: #745626;}
 
@@ -125,7 +125,7 @@ article pre{
 	padding:8px 10px; border-radius:0.4em;
 	overflow-x: hidden;
 }
-article pre code{font-size:1.3rem;}
+article pre code{font-size:1rem;}
 article .thumb{ 
     float:left;
     margin: 10px;
