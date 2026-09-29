@@ -143,7 +143,7 @@ class Main extends React.Component {
 		if (!pathname) return;
 		let { md } = this.state;
 		md = encodeURIComponent(md);
-		fetch.get(url.save, { pathname, md });
+		fetch.post(url.save, { pathname, md });
 	}
 
 	sync () {

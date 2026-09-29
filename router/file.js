@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const querystring = require('querystring');
 const child_process = require('child_process');
 const express = require('express');
 const command = require('../lib/command');
@@ -83,16 +84,20 @@ fileRouter.get('/del', (req, res) => {
 	}
 });
 
-fileRouter.get('/save', (req, res) => {
-	let { pathname, md } = req.query;
-	pathname = path.join(base, pathname);
-	let str = fs.readFileSync(pathname).toString();
-	if (str === md) {
-		res.send({code : 0});
-		return;
-	}
-	fs.writeFile(pathname, md, err => {
-		res.send(err ? {code : -1, err} : {code : 0});
+fileRouter.post('/save', (req, res) => {
+	let body = '';
+	req.on('data', chunk => body += chunk);
+	req.on('end', () => {
+		let { pathname, md } = querystring.parse(body);
+		pathname = path.join(base, pathname);
+		let str = fs.readFileSync(pathname).toString();
+		if (str === md) {
+			res.send({code : 0});
+			return;
+		}
+		fs.writeFile(pathname, md, err => {
+			res.send(err ? {code : -1, err} : {code : 0});
+		});
 	});
 });
 
